@@ -100,7 +100,7 @@ novaflix/
 
 ```env
 # Base de données
-MONGODB_URI=mongodb://localhost:27017/novaflix
+MONGODB_URI=lien vers mongodb
 
 # JWT
 JWT_SECRET=your-super-secret-jwt-key

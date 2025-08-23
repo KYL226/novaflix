@@ -16,7 +16,12 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
 
 export const generateToken = (user: User): string => {
   return jwt.sign(
-    { id: user._id, email: user.email, role: user.role },
+    { 
+      id: user._id, 
+      email: user.email, 
+      role: user.role,
+      subscription: user.subscription || 'free'
+    },
     JWT_SECRET,
     { expiresIn: '7d' }
   );

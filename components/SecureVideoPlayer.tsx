@@ -51,7 +51,7 @@ export default function SecureVideoPlayer({ src, poster, title }: SecureVideoPla
       ) : (
         <video
           ref={videoRef}
-          src={src}
+          src={token ? `${src}?token=${token}` : src}
           poster={poster}
           title={title}
           className="w-full h-full object-contain"
@@ -63,15 +63,6 @@ export default function SecureVideoPlayer({ src, poster, title }: SecureVideoPla
           autoPlay={false}
           playsInline
           crossOrigin="anonymous"
-          onLoadStart={() => {
-            // Ajouter le token d'authentification aux requêtes vidéo
-            if (videoRef.current && token) {
-              const video = videoRef.current;
-              video.addEventListener('loadstart', () => {
-                // Cette approche nécessite une configuration CORS appropriée
-              });
-            }
-          }}
         />
       )}
 

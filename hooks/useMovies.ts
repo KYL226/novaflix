@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Movie } from '@/types';
 
 interface UseMoviesOptions {
@@ -15,6 +15,7 @@ interface UseMoviesReturn {
   loading: boolean;
   error: string | null;
   refetch: () => void;
+  fetchMovies: (type?: string) => Promise<Movie[]>;
 }
 
 export function useMovies(options: UseMoviesOptions = {}): UseMoviesReturn {
@@ -22,13 +23,13 @@ export function useMovies(options: UseMoviesOptions = {}): UseMoviesReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchMovies = async () => {
+  const fetchMovies = useCallback(async (type?: string): Promise<Movie[]> => {
     try {
       setLoading(true);
       setError(null);
       
       const params = new URLSearchParams();
-      if (options.type) params.append('type', options.type);
+      if (type) params.append('type', type);
       if (options.genre) params.append('genre', options.genre);
       if (options.limit) params.append('limit', options.limit.toString());
       if (options.featured) params.append('featured', 'true');
@@ -41,13 +42,16 @@ export function useMovies(options: UseMoviesOptions = {}): UseMoviesReturn {
       const data = await response.json();
       // Support both { data: Movie[] } and { movies: Movie[] }
       const list: Movie[] = data?.data ?? data?.movies ?? [];
-      setMovies(Array.isArray(list) ? list : []);
+      const movies = Array.isArray(list) ? list : [];
+      setMovies(movies);
+      return movies;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      return [];
     } finally {
       setLoading(false);
     }
-  };
+  }, [options.genre, options.limit, options.featured]);
 
   useEffect(() => {
     fetchMovies();
@@ -57,5 +61,5 @@ export function useMovies(options: UseMoviesOptions = {}): UseMoviesReturn {
     fetchMovies();
   };
 
-  return { movies, loading, error, refetch };
+  return { movies, loading, error, refetch, fetchMovies };
 }

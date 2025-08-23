@@ -30,6 +30,11 @@ export default function MovieCard({ movie }: MovieCardProps) {
           height={450}
           className="object-cover w-full h-full"
           unoptimized
+          onError={(e) => {
+            // Fallback vers une image par défaut si l'image n'existe pas
+            const target = e.target as HTMLImageElement;
+            target.src = '/images/placeholder.svg';
+          }}
         />
         
         {/* Overlay au survol */}

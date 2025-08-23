@@ -77,7 +77,7 @@ export default function Header() {
               <SubscriptionStatus />
               <Link href="/profile" className="hover:text-red-500">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.avatar || '/avatar-placeholder.jpg'} alt="Profil" />
+                  <AvatarImage src={user.avatar || '/avatar-placeholder.svg'} alt="Profil" />
                   <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Link>

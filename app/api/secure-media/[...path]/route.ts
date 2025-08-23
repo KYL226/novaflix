@@ -21,9 +21,31 @@ export async function GET(
     const isImage = filePath.startsWith('images/');
 
     if (!isImage) {
-      // Extraire le token d'autorisation
+      // Extraire le token d'autorisation depuis les headers ou cookies
+      let token = null;
+      
+      // Essayer d'abord les headers
       const authHeader = req.headers.get('authorization');
-      const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+      if (authHeader?.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      }
+      
+      // Si pas de token dans les headers, essayer les cookies
+      if (!token) {
+        const cookies = req.headers.get('cookie');
+        if (cookies) {
+          const tokenMatch = cookies.match(/token=([^;]+)/);
+          if (tokenMatch) {
+            token = tokenMatch[1];
+          }
+        }
+      }
+      
+      // Si pas de token dans les cookies, essayer les paramètres de requête
+      if (!token) {
+        const url = new URL(req.url);
+        token = url.searchParams.get('token');
+      }
 
       if (!token) {
         return new NextResponse('Accès refusé', { status: 401 });
