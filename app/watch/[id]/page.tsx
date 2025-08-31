@@ -83,11 +83,32 @@ export default function WatchPage({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-        <SecureVideoPlayer
-          src={`/api/secure-media/videos/${movie.videoUrl}`}
-          poster={movie.posterUrl}
-          title={movie.title}
-        />
+        {movie && movie.videoUrl ? (
+          <SecureVideoPlayer
+            src={`/api/secure-media/videos/${movie.videoUrl}`}
+            poster={movie.posterUrl}
+            title={movie.title}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-black flex items-center justify-center">
+            <div className="text-center p-4">
+              <div className="text-red-400 text-6xl mb-4">❌</div>
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Vidéo non disponible
+              </h3>
+              <p className="text-gray-400 mb-4">
+                Le fichier vidéo pour ce film n'est pas disponible.
+              </p>
+              <Button
+                onClick={() => router.push('/')}
+                variant="outline"
+                className="border-red-600 text-red-400 hover:bg-red-600"
+              >
+                Retour au catalogue
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="p-6 max-w-4xl mx-auto">

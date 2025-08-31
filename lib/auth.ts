@@ -1,7 +1,7 @@
 // lib/auth.ts
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User } from '@/types';
+import { User, DecodedToken } from '@/types';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -27,9 +27,9 @@ export const generateToken = (user: User): string => {
   );
 };
 
-export const verifyToken = (token: string): User | null => {
+export const verifyToken = (token: string): DecodedToken | null => {
   try {
-    return jwt.verify(token, JWT_SECRET) as User;
+    return jwt.verify(token, JWT_SECRET) as DecodedToken;
   } catch (err) {
     return null;
   }

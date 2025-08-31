@@ -1,4 +1,6 @@
 // hooks/useAuth.ts
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 
-export default useAuth;
+export default function useAuth() {
+  return useAuthContext();
+}

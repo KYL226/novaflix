@@ -2,6 +2,8 @@
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from 'next-themes';
 import Header from '@/components/Header';
+import AuthErrorBoundary from '@/components/AuthErrorBoundary';
+import AuthNotification from '@/components/AuthNotification';
 import './globals.css';
 
 export default function RootLayout({
@@ -14,8 +16,11 @@ export default function RootLayout({
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <AuthProvider>
-            <Header />
-            <main>{children}</main>
+            <AuthErrorBoundary>
+              <Header />
+              <main>{children}</main>
+              <AuthNotification />
+            </AuthErrorBoundary>
           </AuthProvider>
         </ThemeProvider>
       </body>

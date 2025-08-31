@@ -8,13 +8,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, User, LogOut, Home, Film, Tv, BookOpen, Menu } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Search, User, LogOut, Home, Film, Tv, BookOpen, Menu, Crown } from 'lucide-react';
 import SearchResults from './SearchResults';
 import ThemeToggle from './ThemeToggle';
 import SubscriptionStatus from './SubscriptionStatus';
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -27,6 +28,11 @@ export default function Header() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    setShowSearchResults(false);
+  };
+
   return (
     <header className="bg-black text-white sticky top-0 z-50">
       <div className="px-4 md:px-8 py-4 flex items-center justify-between">
@@ -37,10 +43,22 @@ export default function Header() {
 
         {/* Navigation Desktop */}
         <nav className="hidden md:flex space-x-6 ml-8">
-          <Link href="/" className="hover:text-red-500 transition">Accueil</Link>
-          <Link href="/films" className="hover:text-red-500 transition">Films</Link>
-          <Link href="/series" className="hover:text-red-500 transition">Séries</Link>
-          <Link href="/documentaires" className="hover:text-red-500 transition">Docu</Link>
+          <Link href="/" className="hover:text-red-500 transition flex items-center space-x-1">
+            <Home className="h-4 w-4" />
+            <span>Accueil</span>
+          </Link>
+          <Link href="/films" className="hover:text-red-500 transition flex items-center space-x-1">
+            <Film className="h-4 w-4" />
+            <span>Films</span>
+          </Link>
+          <Link href="/series" className="hover:text-red-500 transition flex items-center space-x-1">
+            <Tv className="h-4 w-4" />
+            <span>Séries</span>
+          </Link>
+          <Link href="/documentaires" className="hover:text-red-500 transition flex items-center space-x-1">
+            <BookOpen className="h-4 w-4" />
+            <span>Docu</span>
+          </Link>
         </nav>
 
         {/* Barre de recherche */}
@@ -72,16 +90,36 @@ export default function Header() {
         <div className="flex items-center space-x-4">
           <ThemeToggle />
 
-          {user ? (
+          {isLoading ? (
+            <div className="text-gray-400 text-sm">Chargement...</div>
+          ) : user ? (
             <>
               <SubscriptionStatus />
-              <Link href="/profile" className="hover:text-red-500">
+              
+              {/* Indicateur de rôle */}
+              {user.role === 'admin' && (
+                <Badge variant="secondary" className="bg-purple-600 hover:bg-purple-700">
+                  <Crown className="h-3 w-3 mr-1" />
+                  Admin
+                </Badge>
+              )}
+              
+              {/* Indicateur d'abonnement */}
+              {user.subscription === 'premium' && (
+                <Badge variant="secondary" className="bg-yellow-600 hover:bg-yellow-700">
+                  <Crown className="h-3 w-3 mr-1" />
+                  Premium
+                </Badge>
+              )}
+              
+              <Link href="/profile" className="hover:text-red-500 transition">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user.avatar || '/avatar-placeholder.svg'} alt="Profil" />
                   <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Link>
-              <Button variant="ghost" size="icon" onClick={logout}>
+              
+              <Button variant="ghost" size="icon" onClick={handleLogout} className="hover:text-red-500">
                 <LogOut className="h-5 w-5" />
               </Button>
             </>
@@ -96,14 +134,6 @@ export default function Header() {
         <button className="md:hidden">
           <Menu className="h-6 w-6" />
         </button>
-      </div>
-
-      {/* Navigation Mobile */}
-      <div className="md:hidden bg-gray-900 px-4 py-2 space-x-4 text-sm">
-        <Link href="/" className="inline-flex items-center gap-1 hover:text-red-500"><Home className="w-4 h-4" /> Accueil</Link>
-        <Link href="/films" className="inline-flex items-center gap-1 hover:text-red-500"><Film className="w-4 h-4" /> Films</Link>
-        <Link href="/series" className="inline-flex items-center gap-1 hover:text-red-500"><Tv className="w-4 h-4" /> Séries</Link>
-        <Link href="/documentaires" className="inline-flex items-center gap-1 hover:text-red-500"><BookOpen className="w-4 h-4" /> Docu</Link>
       </div>
     </header>
   );

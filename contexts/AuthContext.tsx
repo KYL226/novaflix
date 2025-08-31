@@ -1,10 +1,10 @@
 // contexts/AuthContext.tsx
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { User } from '@/types';
 import { verifyToken } from '@/lib/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface AuthContextType {
   user: User | null;
@@ -12,6 +12,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (name: string, email: string, password: string) => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
   isLoading: boolean;
 }
 
@@ -21,47 +22,89 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+  const checkAuth = useCallback(() => {
+    try {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
 
-    if (storedToken && storedUser) {
-      try {
+      if (storedToken && storedUser) {
         const decoded = verifyToken(storedToken);
         if (decoded) {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
-        } else {
-          console.log('Token invalide, déconnexion...');
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          return;
         }
-      } catch (error) {
-        console.log('Erreur lors de la vérification du token:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
       }
+      
+      // Si on arrive ici, c'est qu'il n'y a pas de token valide
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.error('Erreur lors de la vérification du token:', error);
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
-    setIsLoading(false);
   }, []);
 
+  // Vérification initiale de l'authentification
+  useEffect(() => {
+    checkAuth();
+    setIsInitialized(true);
+    setIsLoading(false);
+  }, [checkAuth]);
+
+  // Vérifier l'authentification lors des changements de route
+  useEffect(() => {
+    if (!isInitialized || isLoading) return;
+
+    // Si on a un token mais pas d'utilisateur, vérifier l'authentification
+    if (token && !user) {
+      checkAuth();
+    }
+  }, [pathname, token, user, isLoading, isInitialized, checkAuth]);
+
+  // Écouter les changements de localStorage (pour la synchronisation entre onglets)
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token' || e.key === 'user') {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [isInitialized, checkAuth]);
+
   const login = async (email: string, password: string) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error);
 
-    setUser(data.user);
-    setToken(data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    localStorage.setItem('token', data.token);
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      throw error;
+    }
   };
 
   const register = async (name: string, email: string, password: string) => {
@@ -84,13 +127,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Rediriger vers la page d'accueil après déconnexion
     router.push('/');
-    
-    // Forcer le rechargement pour nettoyer complètement l'état
-    window.location.reload();
+  };
+
+  const updateUser = (userData: Partial<User>) => {
+    setUser(prevUser => prevUser ? { ...prevUser, ...userData } : null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, register, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, register, updateUser, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

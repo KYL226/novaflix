@@ -13,6 +13,15 @@ export type User = {
   updatedAt?: Date;
 };
 
+export type DecodedToken = {
+  id: string;
+  email: string;
+  role: 'user' | 'admin';
+  subscription?: 'basic' | 'premium' | 'free';
+  iat: number;
+  exp: number;
+};
+
 export type Movie = {
   _id?: string;
   title: string;

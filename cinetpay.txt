@@ -1,0 +1,22 @@
+# Configuration CinetPay
+# Copiez ce fichier vers .env.local et remplissez vos vraies valeurs
+
+# Clés d'API CinetPay (obtenues depuis votre dashboard CinetPay)
+CINETPAY_API_KEY=your_cinetpay_api_key_here
+CINETPAY_SITE_ID=your_cinetpay_site_id_here
+
+# Environnement (TEST pour le développement, PROD pour la production)
+CINETPAY_ENVIRONMENT=TEST
+
+# Configuration de l'application
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Configuration de la base de données (optionnel pour le moment)
+# MONGODB_URI=mongodb://localhost:27017/novaflix
+
+# Clé secrète JWT
+JWT_SECRET=your_jwt_secret_here
+
+# Mode test de l'application
+TEST_MODE_ENABLED=true
+PAYMENT_TEST_MODE=true

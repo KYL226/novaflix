@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test NovaFlix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: white;
+        }
+        .test-section {
+            background-color: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .info { color: #60a5fa; }
+        button {
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #b91c1c;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de l'Application NovaFlix</h1>
+    
+    <div class="test-section">
+        <h2>📋 Statut de l'Application</h2>
+        <div id="app-status" class="status">
+            <span class="info">Vérification en cours...</span>
+        </div>
+        <button onclick="checkAppStatus()">Vérifier le statut</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Test des Routes</h2>
+        <div id="routes-status" class="status">
+            <span class="info">Cliquez sur "Tester les routes" pour commencer</span>
+        </div>
+        <button onclick="testRoutes()">Tester les routes</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🎬 Test des Médias</h2>
+        <div id="media-status" class="status">
+            <span class="info">Cliquez sur "Tester les médias" pour commencer</span>
+        </div>
+        <button onclick="testMedia()">Tester les médias</button>
+    </div>
+
+    <div class="test-section">
+        <h2>💳 Test du Système de Paiement</h2>
+        <div id="payment-status" class="status">
+            <span class="info">Cliquez sur "Tester le paiement" pour commencer</span>
+        </div>
+        <button onclick="testPayment()">Tester le paiement</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Résultats des Tests</h2>
+        <div id="test-results">
+            <p>Aucun test effectué pour le moment.</p>
+        </div>
+    </div>
+
+    <script>
+        const testResults = [];
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<span class="${type}">${message}</span>`;
+        }
+
+        function addTestResult(testName, success, message) {
+            const result = {
+                name: testName,
+                success,
+                message,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            testResults.push(result);
+            updateTestResults();
+        }
+
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            if (testResults.length === 0) {
+                resultsDiv.innerHTML = '<p>Aucun test effectué pour le moment.</p>';
+                return;
+            }
+
+            let html = '<h3>Résultats des Tests</h3>';
+            testResults.forEach(result => {
+                const statusClass = result.success ? 'success' : 'error';
+                const statusIcon = result.success ? '✅' : '❌';
+                html += `
+                    <div class="status">
+                        <strong>${statusIcon} ${result.name}</strong> - ${result.message}
+                        <br><small>${result.timestamp}</small>
+                    </div>
+                `;
+            });
+            resultsDiv.innerHTML = html;
+        }
+
+        async function checkAppStatus() {
+            updateStatus('app-status', 'Vérification en cours...', 'info');
+            
+            try {
+                const response = await fetch('/');
+                if (response.ok) {
+                    updateStatus('app-status', 'Application accessible et fonctionnelle', 'success');
+                    addTestResult('Statut Application', true, 'Application accessible');
+                } else {
+                    updateStatus('app-status', `Erreur ${response.status}: ${response.statusText}`, 'error');
+                    addTestResult('Statut Application', false, `Erreur ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('app-status', `Erreur de connexion: ${error.message}`, 'error');
+                addTestResult('Statut Application', false, `Erreur: ${error.message}`);
+            }
+        }
+
+        async function testRoutes() {
+            updateStatus('routes-status', 'Test des routes en cours...', 'info');
+            
+            const routes = [
+                { name: 'Page de paiement', path: '/payment' },
+                { name: 'Page de test', path: '/test' },
+                { name: 'Navigation de test', path: '/test-nav' },
+                { name: 'Page d\'abonnement', path: '/subscription' }
+            ];
+
+            let successCount = 0;
+            let totalCount = routes.length;
+
+            for (const route of routes) {
+                try {
+                    const response = await fetch(route.path);
+                    if (response.ok) {
+                        successCount++;
+                        addTestResult(route.name, true, 'Route accessible');
+                    } else {
+                        addTestResult(route.name, false, `Erreur ${response.status}`);
+                    }
+                } catch (error) {
+                    addTestResult(route.name, false, `Erreur: ${error.message}`);
+                }
+            }
+
+            const message = `${successCount}/${totalCount} routes accessibles`;
+            const type = successCount === totalCount ? 'success' : 'error';
+            updateStatus('routes-status', message, type);
+        }
+
+        async function testMedia() {
+            updateStatus('media-status', 'Test des médias en cours...', 'info');
+            
+            try {
+                // Test d'une image (devrait être publique)
+                const imageResponse = await fetch('/api/secure-media/images/poster1.jpg');
+                if (imageResponse.ok) {
+                    addTestResult('Accès Image', true, 'Image accessible');
+                } else {
+                    addTestResult('Accès Image', false, `Erreur ${imageResponse.status}`);
+                }
+
+                // Test d'une vidéo (devrait nécessiter une authentification)
+                const videoResponse = await fetch('/api/secure-media/videos/hist.mp4');
+                if (videoResponse.status === 401) {
+                    addTestResult('Sécurité Vidéo', true, 'Vidéo protégée (401 attendu)');
+                } else if (videoResponse.ok) {
+                    addTestResult('Sécurité Vidéo', false, 'Vidéo accessible sans authentification');
+                } else {
+                    addTestResult('Sécurité Vidéo', false, `Statut inattendu: ${videoResponse.status}`);
+                }
+
+                updateStatus('media-status', 'Test des médias terminé', 'success');
+            } catch (error) {
+                updateStatus('media-status', `Erreur: ${error.message}`, 'error');
+                addTestResult('Test Médias', false, `Erreur: ${error.message}`);
+            }
+        }
+
+        async function testPayment() {
+            updateStatus('payment-status', 'Test du système de paiement en cours...', 'info');
+            
+            try {
+                // Test de l'API d'initiation de paiement
+                const response = await fetch('/api/payments/initiate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subscriptionType: 'basic',
+                        testMode: true
+                    })
+                });
+
+                if (response.status === 401) {
+                    addTestResult('API Paiement', true, 'API protégée (401 attendu sans token)');
+                } else if (response.ok) {
+                    addTestResult('API Paiement', true, 'API accessible');
+                } else {
+                    addTestResult('API Paiement', false, `Statut inattendu: ${response.status}`);
+                }
+
+                updateStatus('payment-status', 'Test du système de paiement terminé', 'success');
+            } catch (error) {
+                updateStatus('payment-status', `Erreur: ${error.message}`, 'error');
+                addTestResult('Test Paiement', false, `Erreur: ${error.message}`);
+            }
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', () => {
+            setTimeout(checkAppStatus, 1000);
+        });
+    </script>
+</body>
+</html>

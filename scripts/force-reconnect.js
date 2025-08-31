@@ -5,23 +5,22 @@ const jwt = require('jsonwebtoken');
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/novaflix';
 const JWT_SECRET = process.env.JWT_SECRET;
 
-async function testTokenDebug() {
+async function forceReconnect() {
   const client = new MongoClient(MONGODB_URI);
   
   try {
     await client.connect();
     console.log('✅ Connecté à MongoDB');
-    console.log('🔑 JWT_SECRET:', JWT_SECRET ? 'Défini' : 'Non défini');
     
     const db = client.db('novaflix');
     
-    // Trouver un utilisateur premium
+    // Trouver l'utilisateur test2@gmail.com
     const user = await db.collection('users').findOne({ 
-      subscription: { $in: ['premium', 'basic'] } 
+      email: 'test2@gmail.com'
     });
     
     if (!user) {
-      console.log('❌ Aucun utilisateur premium trouvé');
+      console.log('❌ Utilisateur test2@gmail.com non trouvé');
       return;
     }
     
@@ -32,8 +31,8 @@ async function testTokenDebug() {
       role: user.role
     });
     
-    // Générer un token de test
-    const testToken = jwt.sign(
+    // Générer un nouveau token
+    const newToken = jwt.sign(
       { 
         id: user._id.toString(), 
         email: user.email, 
@@ -44,12 +43,12 @@ async function testTokenDebug() {
       { expiresIn: '7d' }
     );
     
-    console.log('\n🔑 Token généré:', testToken.substring(0, 50) + '...');
+    console.log('\n🔑 Nouveau token généré:', newToken);
     
     // Vérifier le token
     try {
-      const decoded = jwt.verify(testToken, JWT_SECRET);
-      console.log('✅ Token vérifié avec succès:', {
+      const decoded = jwt.verify(newToken, JWT_SECRET);
+      console.log('\n✅ Token vérifié:', {
         id: decoded.id,
         email: decoded.email,
         role: decoded.role,
@@ -59,18 +58,31 @@ async function testTokenDebug() {
         isExpired: Date.now() > decoded.exp * 1000
       });
     } catch (error) {
-      console.error('❌ Erreur lors de la vérification du token:', error);
+      console.error('❌ Erreur lors de la vérification:', error);
+      return;
     }
     
-    // Tester l'URL de l'API secure-media
-    const testUrl = `http://localhost:3000/api/secure-media/videos/test.mp4?token=${testToken}`;
+    // Tester l'API avec le nouveau token
+    const testUrl = `http://localhost:3000/api/secure-media/videos/test.mp4?token=${newToken}`;
     console.log('\n🔗 URL de test:', testUrl);
     
-    console.log('\n💡 Pour tester manuellement :');
-    console.log('1. Copiez l\'URL ci-dessus');
-    console.log('2. Ouvrez un navigateur en mode privé');
-    console.log('3. Collez l\'URL dans la barre d\'adresse');
-    console.log('4. Vérifiez si le fichier se télécharge');
+    console.log('\n💡 Instructions pour forcer la reconnexion :');
+    console.log('1. Ouvrez votre navigateur et allez sur http://localhost:3000');
+    console.log('2. Ouvrez les DevTools (F12)');
+    console.log('3. Allez dans la console et exécutez :');
+    console.log('');
+    console.log('localStorage.setItem("token", "' + newToken + '");');
+    console.log('localStorage.setItem("user", \'' + JSON.stringify({
+      _id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      subscription: user.subscription
+    }) + '\');');
+    console.log('window.location.reload();');
+    console.log('');
+    console.log('4. La page se rechargera avec le nouveau token');
+    console.log('5. Testez maintenant la lecture vidéo');
     
   } catch (error) {
     console.error('❌ Erreur:', error);
@@ -80,4 +92,4 @@ async function testTokenDebug() {
   }
 }
 
-testTokenDebug().catch(console.error);
+forceReconnect().catch(console.error);
