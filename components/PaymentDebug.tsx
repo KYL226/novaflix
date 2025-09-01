@@ -52,16 +52,16 @@ export default function PaymentDebug() {
       if (response.ok) {
         const data = await response.json();
         console.log('✅ Initiation réussie:', data);
-        setResults(prev => ({ ...prev, initiation: data }));
+        setResults((prev: any) => ({ ...prev, initiation: data }));
         setCurrentStep('verify');
       } else {
         const errorData = await response.json();
         console.error('❌ Erreur initiation:', errorData);
-        setErrors(prev => [...prev, `Initiation échouée: ${errorData.error}`]);
+        setErrors((prev: any) => [...prev, `Initiation échouée: ${errorData.error}`]);
       }
     } catch (error) {
       console.error('❌ Erreur lors de l\'initiation:', error);
-      setErrors(prev => [...prev, `Erreur: ${error instanceof Error ? error.message : 'Inconnue'}`]);
+      setErrors((prev: any) => [...prev, `Erreur: ${error instanceof Error ? error.message : 'Inconnue'}`]);
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +69,7 @@ export default function PaymentDebug() {
 
   const testPaymentVerification = async () => {
     if (!results.initiation?.transactionId) {
-      setErrors(prev => [...prev, 'Transaction ID manquant pour la vérification']);
+      setErrors((prev: any) => [...prev, 'Transaction ID manquant pour la vérification']);
       return;
     }
 
@@ -98,7 +98,7 @@ export default function PaymentDebug() {
       if (response.ok) {
         const data = await response.json();
         console.log('✅ Vérification réussie:', data);
-        setResults(prev => ({ ...prev, verification: data }));
+        setResults((prev: any) => ({ ...prev, verification: data }));
         setCurrentStep('complete');
         
         // Mettre à jour le localStorage
@@ -107,11 +107,11 @@ export default function PaymentDebug() {
       } else {
         const errorData = await response.json();
         console.error('❌ Erreur vérification:', errorData);
-        setErrors(prev => [...prev, `Vérification échouée: ${errorData.error}`]);
+        setErrors((prev: any) => [...prev, `Vérification échouée: ${errorData.error}`]);
       }
     } catch (error) {
       console.error('❌ Erreur lors de la vérification:', error);
-      setErrors(prev => [...prev, `Erreur: ${error instanceof Error ? error.message : 'Inconnue'}`]);
+      setErrors((prev: any) => [...prev, `Erreur: ${error instanceof Error ? error.message : 'Inconnue'}`]);
     } finally {
       setIsLoading(false);
     }

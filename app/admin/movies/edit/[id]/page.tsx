@@ -21,6 +21,7 @@ export default function EditMoviePage({ params }: { params: { id: string } }) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [genres, setGenres] = useState<string[]>([]);
+  const [published, setPublished] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
@@ -37,6 +38,7 @@ export default function EditMoviePage({ params }: { params: { id: string } }) {
         if (res.ok) {
           setMovie(data.data);
           setGenres(data.data.genre || []);
+          setPublished(data.data.published || false);
         } else {
           setError(data.error || 'Film non trouvé');
         }
@@ -65,7 +67,7 @@ export default function EditMoviePage({ params }: { params: { id: string } }) {
       videoUrl: formData.get('videoUrl') as string,
       posterUrl: formData.get('posterUrl') as string,
       genre: genres.filter(g => g.trim() !== ''),
-      published: formData.get('published') ? true : false,
+      published: published,
     };
 
     try {
@@ -227,8 +229,11 @@ export default function EditMoviePage({ params }: { params: { id: string } }) {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Switch id="published" name="published" defaultChecked={movie.published} />
-            <Label htmlFor="published">Publié</Label>
+            <Switch 
+              checked={published} 
+              onCheckedChange={setPublished}
+            />
+            <Label>Publié</Label>
           </div>
 
           <div className="flex gap-4">

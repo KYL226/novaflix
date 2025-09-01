@@ -345,8 +345,8 @@ export default function MediaTest() {
     </div>
   );
 }
-
 // Composant Label simple pour éviter les erreurs d'import
 const Label = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
   <label className={className}>{children}</label>
 );
+

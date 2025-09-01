@@ -1,9 +1,12 @@
 // app/api/secure-media/[...path]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
-import fs from 'fs';
+import { existsSync } from 'fs';
+import { readFile } from 'fs/promises';
 import path from 'path';
 import mime from 'mime-types';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest, { params }: { params: { path: string[] } }) {
   try {
@@ -149,7 +152,7 @@ export async function GET(req: NextRequest, { params }: { params: { path: string
     }
 
     // Vérifier que le fichier existe
-    if (!fs.existsSync(fullPath)) {
+    if (!existsSync(fullPath)) {
       console.log('❌ Fichier non trouvé:', fullPath);
       return new NextResponse('Fichier non trouvé', { status: 404 });
     }
@@ -157,7 +160,7 @@ export async function GET(req: NextRequest, { params }: { params: { path: string
     console.log('✅ Fichier trouvé, lecture en cours...');
 
     // Lire le fichier
-    const fileBuffer = fs.readFileSync(fullPath);
+    const fileBuffer = await readFile(fullPath);
     const contentType = mime.lookup(fullPath) || 'application/octet-stream';
 
     console.log('📊 Taille du fichier:', fileBuffer.length, 'bytes');
@@ -168,7 +171,8 @@ export async function GET(req: NextRequest, { params }: { params: { path: string
       ? 'public, max-age=86400' // Images: cache public pendant 24h
       : 'private, max-age=3600'; // Vidéos: cache privé pendant 1h
 
-    const response = new NextResponse(fileBuffer, {
+    const response = new Response(new Uint8Array(fileBuffer), {
+      status: 200,
       headers: {
         'Content-Type': contentType,
         'Cache-Control': cacheControl,

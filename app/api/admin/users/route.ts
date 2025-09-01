@@ -57,7 +57,7 @@ export async function PATCH(req: NextRequest) {
     updateFields.updatedAt = new Date();
 
     const result = await users.updateOne(
-      { _id: new ObjectId(id) },
+      { _id: new ObjectId(id) as any },
       { $set: updateFields }
     );
 

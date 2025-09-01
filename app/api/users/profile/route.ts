@@ -3,6 +3,8 @@ import { verifyToken } from '@/lib/auth';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(req: NextRequest) {
   try {
     const authHeader = req.headers.get('authorization');
@@ -39,7 +41,7 @@ export async function PUT(req: NextRequest) {
     // Vérifier que l'email n'est pas déjà utilisé par un autre utilisateur
     const existingUser = await db.collection('users').findOne({
       email,
-      _id: { $ne: new ObjectId(decoded.id) }
+      _id: { $ne: new ObjectId(decoded.id) as any }
     });
 
     if (existingUser) {
@@ -60,7 +62,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const result = await db.collection('users').updateOne(
-      { _id: new ObjectId(decoded.id) },
+      { _id: new ObjectId(decoded.id) as any },
       { $set: updateData }
     );
 
@@ -72,10 +74,16 @@ export async function PUT(req: NextRequest) {
 
     // Récupérer l'utilisateur mis à jour
     const updatedUser = await db.collection('users').findOne({
-      _id: new ObjectId(decoded.id)
+      _id: new ObjectId(decoded.id) as any
     });
 
-    const { password: _, ...userWithoutPassword } = updatedUser;
+    if (!updatedUser) {
+      return NextResponse.json({
+        error: 'Utilisateur non trouvé'
+      }, { status: 404 });
+    }
+
+    const { password: _, ...userWithoutPassword } = updatedUser as any;
 
     return NextResponse.json({
       success: true,

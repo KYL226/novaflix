@@ -1,7 +1,9 @@
 // app/api/subscription/update-user/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
-import { db } from '@/lib/models';
+import clientPromise from '@/lib/mongodb';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,7 +44,10 @@ export async function POST(req: NextRequest) {
 
     try {
       // Mettre à jour l'utilisateur en base de données
-      const users = await db.getUsers();
+      const client = await clientPromise;
+      const db = client.db('novaflix');
+      const users = db.collection('users');
+      
       const result = await users.updateOne(
         { email: decoded.email },
         { 

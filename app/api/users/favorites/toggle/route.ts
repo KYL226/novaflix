@@ -3,6 +3,8 @@ import { verifyToken } from '@/lib/auth';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get('authorization');
@@ -28,21 +30,21 @@ export async function POST(req: NextRequest) {
     
     // Vérifier si le film est déjà dans les favoris
     const user = await db.collection('users').findOne({
-      _id: new ObjectId(decoded.id),
-      'favorites': new ObjectId(movieId)
+      _id: new ObjectId(decoded.id) as any,
+      'favorites': new ObjectId(movieId) as any
     });
 
     if (user) {
       // Retirer des favoris
       await db.collection('users').updateOne(
-        { _id: new ObjectId(decoded.id) },
-        { $pull: { favorites: new ObjectId(movieId) } }
+        { _id: new ObjectId(decoded.id) as any },
+        { $pull: { favorites: new ObjectId(movieId) as any } }
       );
     } else {
       // Ajouter aux favoris
       await db.collection('users').updateOne(
-        { _id: new ObjectId(decoded.id) },
-        { $addToSet: { favorites: new ObjectId(movieId) } }
+        { _id: new ObjectId(decoded.id) as any },
+        { $addToSet: { favorites: new ObjectId(movieId) as any } }
       );
     }
 

@@ -2,6 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { DecodedToken } from '@/types';
+import clientPromise from '@/lib/mongodb';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
 import { Search, Filter, X } from 'lucide-react';
 
 interface AdvancedSearchProps {
@@ -108,70 +108,54 @@ export default function AdvancedSearch({ onSearch, className = '' }: AdvancedSea
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <Label htmlFor="genre">Genre</Label>
-              <Select value={filters.genre} onValueChange={(value) => setFilters({ ...filters, genre: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Tous les genres" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tous les genres</SelectItem>
-                  {genres.map((genre) => (
-                    <SelectItem key={genre} value={genre.toLowerCase()}>
-                      {genre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Select
+                value={filters.genre}
+                onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
+                options={[
+                  { value: '', label: 'Tous les genres' },
+                  ...genres.map(genre => ({ value: genre.toLowerCase(), label: genre }))
+                ]}
+                placeholder="Tous les genres"
+              />
             </div>
 
             <div>
               <Label htmlFor="type">Type</Label>
-              <Select value={filters.type} onValueChange={(value) => setFilters({ ...filters, type: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Tous les types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tous les types</SelectItem>
-                  {types.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Select
+                value={filters.type}
+                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                options={[
+                  { value: '', label: 'Tous les types' },
+                  ...types.map(type => ({ value: type, label: type.charAt(0).toUpperCase() + type.slice(1) }))
+                ]}
+                placeholder="Tous les types"
+              />
             </div>
 
             <div>
               <Label htmlFor="year">Année</Label>
-              <Select value={filters.year} onValueChange={(value) => setFilters({ ...filters, year: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Toutes les années" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Toutes les années</SelectItem>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Select
+                value={filters.year}
+                onChange={(e) => setFilters({ ...filters, year: e.target.value })}
+                options={[
+                  { value: '', label: 'Toutes les années' },
+                  ...years.map(year => ({ value: year, label: year }))
+                ]}
+                placeholder="Toutes les années"
+              />
             </div>
 
             <div>
               <Label htmlFor="duration">Durée</Label>
-              <Select value={filters.duration} onValueChange={(value) => setFilters({ ...filters, duration: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Toutes les durées" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Toutes les durées</SelectItem>
-                  {durations.map((duration) => (
-                    <SelectItem key={duration} value={duration}>
-                      {duration}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Select
+                value={filters.duration}
+                onChange={(e) => setFilters({ ...filters, duration: e.target.value })}
+                options={[
+                  { value: '', label: 'Toutes les durées' },
+                  ...durations.map(duration => ({ value: duration, label: duration }))
+                ]}
+                placeholder="Toutes les durées"
+              />
             </div>
           </div>
         </div>
