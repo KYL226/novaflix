@@ -1,4 +1,4 @@
-// components/HeroSection.tsx
+// components/AuthenticatedHeroSection.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -6,7 +6,7 @@ import { Movie } from '@/types';
 import Link from 'next/link';
 import { Play, Info, Star, Calendar, Clock } from 'lucide-react';
 
-export default function HeroSection() {
+export default function AuthenticatedHeroSection() {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,15 +30,15 @@ export default function HeroSection() {
 
   if (isLoading) {
     return (
-      <div className="relative w-full h-[70vh] md:h-[80vh] bg-gradient-to-br from-gray-900 via-black to-gray-800 animate-pulse">
+      <div className="relative w-full h-[50vh] md:h-[60vh] bg-gradient-to-br from-gray-900 via-black to-gray-800 animate-pulse">
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col justify-center pl-6 md:pl-16 text-white">
-          <div className="h-16 bg-gray-700 rounded w-96 mb-4 animate-pulse"></div>
-          <div className="h-6 bg-gray-700 rounded w-80 mb-2 animate-pulse"></div>
-          <div className="h-6 bg-gray-700 rounded w-72 mb-6 animate-pulse"></div>
+          <div className="h-12 bg-gray-700 rounded w-80 mb-4 animate-pulse"></div>
+          <div className="h-5 bg-gray-700 rounded w-64 mb-2 animate-pulse"></div>
+          <div className="h-5 bg-gray-700 rounded w-56 mb-6 animate-pulse"></div>
           <div className="flex space-x-4">
-            <div className="h-12 bg-gray-700 rounded w-32 animate-pulse"></div>
-            <div className="h-12 bg-gray-700 rounded w-32 animate-pulse"></div>
+            <div className="h-10 bg-gray-700 rounded w-28 animate-pulse"></div>
+            <div className="h-10 bg-gray-700 rounded w-28 animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -47,31 +47,22 @@ export default function HeroSection() {
 
   if (!movie) {
     return (
-      <div className="relative w-full h-[70vh] md:h-[80vh] bg-gradient-to-br from-red-900 via-black to-gray-900">
+      <div className="relative w-full h-[50vh] md:h-[60vh] bg-gradient-to-br from-red-900 via-black to-gray-900">
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center px-6">
-          <h1 className="text-4xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-red-500 to-white bg-clip-text text-transparent">
-            Novaflix
+        <div className="absolute inset-0 flex flex-col justify-center pl-6 md:pl-16 text-white">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">
+            Bienvenue sur <span className="text-red-600">Novaflix</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl">
-            Découvrez des milliers de films, séries et documentaires en streaming de qualité
+          <p className="text-lg md:text-xl mb-6 max-w-xl">
+            Découvrez votre prochain film ou série préféré
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link 
-              href="/auth" 
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
-            >
-              <Play className="w-6 h-6" />
-              Commencer maintenant
-            </Link>
-            <Link 
-              href="/films" 
-              className="bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-2"
-            >
-              <Info className="w-6 h-6" />
-              Découvrir
-            </Link>
-          </div>
+          <Link 
+            href="/films" 
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 flex items-center gap-2 w-fit"
+          >
+            <Play className="w-5 h-5" />
+            Explorer le catalogue
+          </Link>
         </div>
       </div>
     );
@@ -79,7 +70,7 @@ export default function HeroSection() {
 
   return (
     <div
-      className="relative w-full h-[70vh] md:h-[80vh] bg-cover bg-center bg-no-repeat"
+      className="relative w-full h-[50vh] md:h-[60vh] bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%), url(${movie.posterUrl}?w=1920&h=1080&fit=crop)`,
       }}
@@ -91,7 +82,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 flex flex-col justify-center pl-6 md:pl-16 text-white">
         <div className="max-w-2xl">
           {/* Movie title */}
-          <h1 className="text-4xl md:text-7xl font-bold mb-4 drop-shadow-2xl leading-tight">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 drop-shadow-2xl leading-tight">
             {movie.title}
           </h1>
           
@@ -115,21 +106,21 @@ export default function HeroSection() {
           </div>
           
           {/* Description */}
-          <p className="text-base md:text-lg mb-8 line-clamp-3 drop-shadow-lg max-w-xl">
+          <p className="text-sm md:text-base mb-6 line-clamp-2 drop-shadow-lg max-w-xl">
             {movie.description}
           </p>
           
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Link 
               href={`/watch/${movie._id}`}
-              className="bg-white text-black px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-200 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg"
+              className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg"
             >
-              <Play className="w-6 h-6" />
+              <Play className="w-5 h-5" />
               Regarder maintenant
             </Link>
-            <button className="bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-2 border border-white/30">
-              <Info className="w-6 h-6" />
+            <button className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-2 border border-white/30">
+              <Info className="w-5 h-5" />
               Plus d'infos
             </button>
           </div>
@@ -137,7 +128,7 @@ export default function HeroSection() {
       </div>
       
       {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black to-transparent"></div>
     </div>
   );
 }

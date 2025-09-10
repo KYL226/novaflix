@@ -131,7 +131,7 @@ export default function Header() {
         </div>
 
         {/* Menu Mobile */}
-        <button className="md:hidden">
+        <button className="md:hidden text-white hover:text-red-500 transition-colors">
           <Menu className="h-6 w-6" />
         </button>
       </div>
