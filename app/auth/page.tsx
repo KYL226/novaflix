@@ -52,7 +52,7 @@ export default function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black p-4">
       <Card className="w-full max-w-md border-none shadow-2xl bg-white/10 backdrop-blur-md text-white">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-white">CinéLux</CardTitle>
+          <CardTitle className="text-3xl font-bold text-white">NovaFlix</CardTitle>
           <CardDescription className="text-gray-300">
             {isLogin ? 'Connecte-toi pour accéder à tes films' : 'Rejoins CinéLux aujourd\'hui'}
           </CardDescription>
