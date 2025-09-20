@@ -26,6 +26,25 @@ export default function SubscriptionStatus() {
   const [error, setError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Vérifier d'abord le statut de l'utilisateur dans le contexte
+  const getUserSubscriptionStatus = () => {
+    if (!user) return null;
+    
+    // Si l'utilisateur a un abonnement défini dans son profil
+    if (user.subscription && user.subscription !== 'free') {
+      return {
+        type: user.subscription,
+        status: 'active' as const,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 jours
+        daysRemaining: 30,
+        progress: 100
+      };
+    }
+    
+    return null;
+  };
+
   // Convertir les dates en objets Date si nécessaire
   const normalizeSubscription = useCallback((sub: any): Subscription => {
     return {
@@ -40,10 +59,15 @@ export default function SubscriptionStatus() {
       setIsLoading(true);
       setError(null);
 
-      // Nettoyer les anciennes données de test obsolètes
-      cleanupOldTestData();
+      // Vérifier d'abord le statut de l'utilisateur dans le contexte
+      const userSubscription = getUserSubscriptionStatus();
+      if (userSubscription) {
+        setSubscription(normalizeSubscription(userSubscription));
+        setIsLoading(false);
+        return;
+      }
 
-      // Essayer de récupérer l'abonnement depuis l'API
+      // Si l'utilisateur n'a pas d'abonnement dans son profil, vérifier l'API
       const token = localStorage.getItem('token');
       if (token) {
         try {
@@ -61,17 +85,12 @@ export default function SubscriptionStatus() {
             }
           }
         } catch (apiError) {
-          console.log('API subscription non disponible, utilisation du localStorage');
+          console.log('API subscription non disponible');
         }
       }
 
-      // Fallback : vérifier le localStorage pour les données CinetPay
-      const cinetPaySubscription = getCinetPaySubscriptionFromStorage();
-      if (cinetPaySubscription) {
-        setSubscription(normalizeSubscription(cinetPaySubscription));
-      } else {
-        setSubscription(null);
-      }
+      // Si aucun abonnement trouvé, afficher "Aucun abonnement"
+      setSubscription(null);
 
     } catch (error) {
       console.error('Erreur lors du chargement du statut:', error);
@@ -79,7 +98,7 @@ export default function SubscriptionStatus() {
     } finally {
       setIsLoading(false);
     }
-  }, [normalizeSubscription]);
+  }, [normalizeSubscription, getUserSubscriptionStatus]);
 
   useEffect(() => {
     loadSubscriptionStatus();
@@ -104,52 +123,7 @@ export default function SubscriptionStatus() {
     setShowDetails(false);
   }, [router]);
 
-  const cleanupOldTestData = useCallback(() => {
-    // Supprimer les anciennes données de test obsolètes
-    const oldKeys = [
-      'cinetPaySubscription',
-      'testSubscription',
-      'mockSubscription'
-    ];
 
-    oldKeys.forEach(key => {
-      const oldData = localStorage.getItem(key);
-      if (oldData) {
-        try {
-          const parsed = JSON.parse(oldData);
-          // Supprimer si plus de 24h
-          if (parsed.timestamp && Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000) {
-            localStorage.removeItem(key);
-          }
-        } catch {
-          localStorage.removeItem(key);
-        }
-      }
-    });
-  }, []);
-
-  const getCinetPaySubscriptionFromStorage = useCallback((): Subscription | null => {
-    try {
-      const stored = localStorage.getItem('cinetPaySubscription');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed && parsed.status === 'success') {
-          return {
-            id: parsed.id || 'local_test',
-            type: parsed.type || 'basic',
-            status: 'active',
-            startDate: new Date(),
-            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            daysRemaining: 30,
-            progress: 100
-          };
-        }
-      }
-    } catch (error) {
-      console.error('Erreur lors de la lecture du localStorage:', error);
-    }
-    return null;
-  }, []);
 
   const refreshSubscription = useCallback(() => {
     loadSubscriptionStatus();

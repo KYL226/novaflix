@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Movie } from '@/types';
 import Link from 'next/link';
 import { Play, Info, Star, Calendar, Clock } from 'lucide-react';
+import SecureBackgroundImage from '@/components/SecureBackgroundImage';
 
 export default function AuthenticatedHeroSection() {
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -69,14 +70,12 @@ export default function AuthenticatedHeroSection() {
   }
 
   return (
-    <div
-      className="relative w-full h-[50vh] md:h-[60vh] bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%), url(${movie.posterUrl}?w=1920&h=1080&fit=crop)`,
-      }}
+    <SecureBackgroundImage
+      src={movie.posterUrl}
+      className="relative w-full h-[50vh] md:h-[60vh]"
     >
       {/* Overlay gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
       
       {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-center pl-6 md:pl-16 text-white">
@@ -129,6 +128,6 @@ export default function AuthenticatedHeroSection() {
       
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black to-transparent"></div>
-    </div>
+    </SecureBackgroundImage>
   );
 }

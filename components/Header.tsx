@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, User, LogOut, Home, Film, Tv, BookOpen, Menu, Crown } from 'lucide-react';
 import SearchResults from './SearchResults';
 import ThemeToggle from './ThemeToggle';
-import SubscriptionStatus from './SubscriptionStatus';
+import SimpleSubscriptionStatus from './SimpleSubscriptionStatus';
 
 export default function Header() {
   const { user, logout, isLoading } = useAuth();
@@ -94,7 +94,8 @@ export default function Header() {
             <div className="text-gray-400 text-sm">Chargement...</div>
           ) : user ? (
             <>
-              <SubscriptionStatus />
+              {/* Statut d'abonnement simplifié */}
+              <SimpleSubscriptionStatus />
               
               {/* Indicateur de rôle */}
               {user.role === 'admin' && (
@@ -104,18 +105,10 @@ export default function Header() {
                 </Badge>
               )}
               
-              {/* Indicateur d'abonnement */}
-              {user.subscription === 'premium' && (
-                <Badge variant="secondary" className="bg-yellow-600 hover:bg-yellow-700">
-                  <Crown className="h-3 w-3 mr-1" />
-                  Premium
-                </Badge>
-              )}
-              
               <Link href="/profile" className="hover:text-red-500 transition">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user.avatar || '/avatar-placeholder.svg'} alt="Profil" />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
               </Link>
               

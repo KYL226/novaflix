@@ -32,9 +32,6 @@ export default function PaymentDebug() {
         return;
       }
 
-      console.log('🔍 Test 1: Initiation du paiement');
-      console.log('Token:', token.substring(0, 20) + '...');
-
       const response = await fetch('/api/payments/initiate', {
         method: 'POST',
         headers: {
@@ -47,20 +44,15 @@ export default function PaymentDebug() {
         })
       });
 
-      console.log('Réponse initiation:', response.status, response.statusText);
-
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Initiation réussie:', data);
         setResults((prev: any) => ({ ...prev, initiation: data }));
         setCurrentStep('verify');
       } else {
         const errorData = await response.json();
-        console.error('❌ Erreur initiation:', errorData);
         setErrors((prev: any) => [...prev, `Initiation échouée: ${errorData.error}`]);
       }
     } catch (error) {
-      console.error('❌ Erreur lors de l\'initiation:', error);
       setErrors((prev: any) => [...prev, `Erreur: ${error instanceof Error ? error.message : 'Inconnue'}`]);
     } finally {
       setIsLoading(false);
@@ -77,9 +69,6 @@ export default function PaymentDebug() {
     setErrors([]);
 
     try {
-      console.log('🔍 Test 2: Vérification du paiement');
-      console.log('Transaction ID:', results.initiation.transactionId);
-
       const response = await fetch('/api/payments/verify', {
         method: 'POST',
         headers: {
@@ -93,24 +82,18 @@ export default function PaymentDebug() {
         })
       });
 
-      console.log('Réponse vérification:', response.status, response.statusText);
-
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Vérification réussie:', data);
         setResults((prev: any) => ({ ...prev, verification: data }));
         setCurrentStep('complete');
         
         // Mettre à jour le localStorage
         localStorage.setItem('userSubscription', 'basic');
-        console.log('✅ Abonnement sauvegardé dans localStorage');
       } else {
         const errorData = await response.json();
-        console.error('❌ Erreur vérification:', errorData);
         setErrors((prev: any) => [...prev, `Vérification échouée: ${errorData.error}`]);
       }
     } catch (error) {
-      console.error('❌ Erreur lors de la vérification:', error);
       setErrors((prev: any) => [...prev, `Erreur: ${error instanceof Error ? error.message : 'Inconnue'}`]);
     } finally {
       setIsLoading(false);

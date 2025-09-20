@@ -25,7 +25,7 @@ interface SimulatedTransaction {
 export default function PaymentSimulatePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, token } = useAuth();
+  const { user, token, updateUser } = useAuth();
   const { isLoading: authLoading } = useProtectedRoute();
   
   const [transaction, setTransaction] = useState<SimulatedTransaction | null>(null);
@@ -105,8 +105,11 @@ export default function PaymentSimulatePage() {
             type: transaction.plan.type
           }));
 
-          // 4. Rafraîchir le contexte d'authentification pour refléter le nouveau statut
-          window.location.reload();
+          // 4. Mettre à jour l'utilisateur dans le contexte d'authentification
+          if (updateUser) {
+            updateUser({ subscription: transaction.plan.type });
+            console.log('✅ Utilisateur mis à jour dans le contexte:', { subscription: transaction.plan.type });
+          }
 
           setActivationError(null);
         } else {

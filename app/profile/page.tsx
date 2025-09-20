@@ -44,10 +44,10 @@ export default function ProfilePage() {
               <div className="mx-auto mb-4">
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={user.avatar || '/avatar-placeholder.svg'} alt="Avatar" />
-                  <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-2xl">{user.name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
               </div>
-              <CardTitle className="text-xl">{user.name}</CardTitle>
+              <CardTitle className="text-xl">{user.name || 'Utilisateur'}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center space-x-3 text-gray-300">

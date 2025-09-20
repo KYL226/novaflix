@@ -39,6 +39,7 @@ export default function AuthPage() {
         }
       } else {
         await register(name, email, password);
+        // L'utilisateur est maintenant connecté automatiquement
         router.push('/');
       }
     } catch (err: any) {
@@ -88,6 +89,7 @@ export default function AuthPage() {
                     onChange={(e) => setName(e.target.value)}
                     className="mt-1 bg-white/20 border-white/30 text-white placeholder-gray-400"
                     placeholder="John Doe"
+                    autoComplete="name"
                     required={!isLogin}
                   />
                 </div>
@@ -102,6 +104,7 @@ export default function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="mt-1 bg-white/20 border-white/30 text-white placeholder-gray-400"
                   placeholder="vous@email.com"
+                  autoComplete="email"
                   required
                 />
               </div>
@@ -115,6 +118,7 @@ export default function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="mt-1 bg-white/20 border-white/30 text-white placeholder-gray-400"
                   placeholder="••••••••"
+                  autoComplete={isLogin ? "current-password" : "new-password"}
                   required
                   minLength={6}
                 />

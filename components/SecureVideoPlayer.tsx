@@ -4,6 +4,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
+// Fonction utilitaire pour les logs sécurisés (désactivés en production)
+const secureLog = (message: string, data?: any) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(message, data);
+  }
+};
+
 interface SecureVideoPlayerProps {
   src: string;
   poster?: string;
@@ -19,16 +26,8 @@ export default function SecureVideoPlayer({ src, poster, title }: SecureVideoPla
   const { token, user, updateUser } = useAuth();
 
   useEffect(() => {
-    console.log('🔍 SecureVideoPlayer - État de l\'authentification:', {
-      hasToken: !!token,
-      hasUser: !!user,
-      userSubscription: user?.subscription,
-      src: src
-    });
-
     // Vérifier si src est valide
     if (!src || src.trim() === '') {
-      console.error('❌ URL vidéo vide ou invalide:', src);
       setError('URL vidéo manquante ou invalide');
       setVideoUrl('');
       return;
@@ -51,19 +50,12 @@ export default function SecureVideoPlayer({ src, poster, title }: SecureVideoPla
         url.searchParams.set('token', token);
         const finalUrl = url.toString();
         setVideoUrl(finalUrl);
-        
-        console.log('🔗 URL vidéo construite:', finalUrl);
-        console.log('🔑 Token utilisé:', token.substring(0, 20) + '...');
-        console.log('🔍 Token complet:', token);
-        console.log('🔍 URL de base:', baseUrl);
       } catch (error) {
-        console.error('❌ Erreur lors de la construction de l\'URL:', error);
         setError('URL vidéo invalide');
         setVideoUrl('');
       }
     } else {
       setVideoUrl(src);
-      console.log('⚠️ Pas de token ou utilisateur, URL originale utilisée');
     }
   }, [src, token, user]);
 
@@ -72,7 +64,6 @@ export default function SecureVideoPlayer({ src, poster, title }: SecureVideoPla
     const checkAndUpdateSubscription = async () => {
       if (token && user && (!user.subscription || user.subscription === 'free')) {
         try {
-          console.log('🔍 Vérification du statut d\'abonnement...');
           const res = await fetch('/api/subscription/status', {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -82,12 +73,11 @@ export default function SecureVideoPlayer({ src, poster, title }: SecureVideoPla
           if (res.ok) {
             const data = await res.json();
             if (data.success && data.subscription && data.subscription.status === 'active') {
-              console.log('✅ Abonnement actif détecté, mise à jour de l\'utilisateur');
               updateUser({ subscription: data.subscription.type });
             }
           }
         } catch (error) {
-          console.error('❌ Erreur lors de la vérification de l\'abonnement:', error);
+          // Erreur silencieuse pour éviter l'exposition d'informations
         }
       }
     };
@@ -112,27 +102,17 @@ export default function SecureVideoPlayer({ src, poster, title }: SecureVideoPla
   };
 
   const handleError = (e: any) => {
-    console.error('Erreur vidéo:', e);
-    console.error('🔍 Détails de l\'erreur:', {
-      videoUrl,
-      hasToken: !!token,
-      userSubscription: user?.subscription,
-      errorEvent: e
-    });
-    
     // Vérifier le type d'erreur
     if (e.target && e.target.error) {
       const videoError = e.target.error;
-      console.error('📹 Code d\'erreur vidéo:', videoError.code);
-      console.error('📹 Message d\'erreur vidéo:', videoError.message);
       
       if (videoError.code === 4) {
-        setError('Erreur 401: Problème d\'authentification. Vérifiez votre token et votre abonnement.');
+        setError('Erreur d\'authentification. Vérifiez votre abonnement.');
       } else {
-        setError(`Erreur vidéo (${videoError.code}): ${videoError.message}`);
+        setError('Erreur lors du chargement de la vidéo.');
       }
     } else {
-      setError('Impossible de charger la vidéo. Vérifiez votre connexion ou votre abonnement.');
+      setError('Impossible de charger la vidéo. Vérifiez votre connexion.');
     }
   };
 

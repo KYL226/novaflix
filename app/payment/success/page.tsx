@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +20,7 @@ interface PaymentSuccessData {
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user, updateUser } = useAuth();
   const [paymentData, setPaymentData] = useState<PaymentSuccessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,12 @@ export default function PaymentSuccessPage() {
 
       if (data.success && data.status === 'success') {
         console.log('✅ Paiement confirmé:', data);
+        
+        // Mettre à jour l'utilisateur dans le contexte d'authentification
+        if (user && updateUser) {
+          updateUser({ subscription: plan });
+          console.log('✅ Utilisateur mis à jour dans le contexte:', { subscription: plan });
+        }
         
         // Mettre à jour le localStorage
         localStorage.setItem('userSubscription', plan);

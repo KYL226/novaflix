@@ -14,25 +14,31 @@ export default function AuthNotification() {
     message: string;
     timestamp: number;
   }>>([]);
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
+  const [lastUser, setLastUser] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoading) return;
 
-    // Notification de connexion réussie
-    if (user && token) {
+    // Notification de connexion réussie (seulement la première fois)
+    if (user && token && !hasShownWelcome && user._id !== lastUser) {
       addNotification('success', `Bienvenue, ${user.name} ! Vous êtes maintenant connecté.`);
+      setHasShownWelcome(true);
+      setLastUser(user._id);
     }
 
     // Notification de déconnexion
     if (!user && !token && pathname !== '/auth') {
       addNotification('info', 'Vous avez été déconnecté. Veuillez vous reconnecter pour continuer.');
+      setHasShownWelcome(false);
+      setLastUser(null);
     }
 
     // Notification de navigation vers la page de paiement
     if (pathname === '/payment' && user) {
       addNotification('info', 'Page de paiement chargée. Votre session est maintenue.', 3000);
     }
-  }, [user, token, isLoading, pathname]);
+  }, [user, token, isLoading, pathname, hasShownWelcome, lastUser]);
 
   const addNotification = (type: 'success' | 'error' | 'info', message: string, duration: number = 5000) => {
     const id = Math.random().toString(36).substr(2, 9);

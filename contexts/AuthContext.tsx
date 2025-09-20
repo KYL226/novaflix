@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback 
 import { User } from '@/types';
 import { verifyToken } from '@/lib/auth';
 import { useRouter, usePathname } from 'next/navigation';
+import { scheduleIdleCallback, optimizedStateUpdate, optimizedLocalStorage } from '@/lib/performance';
 
 interface AuthContextType {
   user: User | null;
@@ -27,6 +28,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   const checkAuth = useCallback(() => {
+    // Utiliser scheduleIdleCallback pour éviter les violations de performance
+    scheduleIdleCallback(() => {
+      performAuthCheck();
+    });
+  }, []);
+
+  const performAuthCheck = useCallback(() => {
     try {
       const storedToken = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
@@ -67,7 +75,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Si on a un token mais pas d'utilisateur, vérifier l'authentification
     if (token && !user) {
-      checkAuth();
+      // Utiliser setTimeout pour éviter les violations de performance
+      const timeoutId = setTimeout(() => {
+        checkAuth();
+      }, 0);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [pathname, token, user, isLoading, isInitialized, checkAuth]);
 
@@ -97,10 +110,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!res.ok) throw new Error(data.error);
 
-      setUser(data.user);
-      setToken(data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
+      // Utiliser les utilitaires de performance pour éviter les violations
+      optimizedStateUpdate(setUser, data.user);
+      optimizedStateUpdate(setToken, data.token);
+      optimizedLocalStorage.setItem('user', JSON.stringify(data.user));
+      optimizedLocalStorage.setItem('token', data.token);
     } catch (error) {
       console.error('Erreur de connexion:', error);
       throw error;
@@ -117,6 +131,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.error);
+
+    // Connecter automatiquement l'utilisateur après inscription
+    // Utiliser les utilitaires de performance pour éviter les violations
+    optimizedStateUpdate(setUser, data.user);
+    optimizedStateUpdate(setToken, data.token);
+    optimizedLocalStorage.setItem('user', JSON.stringify(data.user));
+    optimizedLocalStorage.setItem('token', data.token);
   };
 
   const logout = () => {

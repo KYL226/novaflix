@@ -126,7 +126,7 @@ export default function UserProfile() {
             <div className="relative">
               <Avatar className="w-24 h-24">
                 <AvatarImage src={profileData.avatar || '/avatar-placeholder.jpg'} alt="Avatar" />
-                <AvatarFallback className="text-2xl">{user.name?.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="text-2xl">{user.name?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
               <Button
                 size="icon"

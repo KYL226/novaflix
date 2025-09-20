@@ -1,7 +1,7 @@
 // app/api/auth/register/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/models';
-import { hashPassword } from '@/lib/auth';
+import { hashPassword, generateToken } from '@/lib/auth';
 import { User } from '@/types';
 
 export async function POST(req: NextRequest) {
@@ -41,8 +41,23 @@ export async function POST(req: NextRequest) {
     const { password: _, ...userWithoutPassword } = newUser;
     (userWithoutPassword as any)._id = result.insertedId;
 
+    // Créer l'objet utilisateur complet pour le token
+    const userForToken = {
+      _id: result.insertedId.toString(),
+      name: userWithoutPassword.name,
+      email: userWithoutPassword.email,
+      role: userWithoutPassword.role,
+      subscription: userWithoutPassword.subscription
+    };
+
+    // Générer un token pour connecter automatiquement l'utilisateur
+    const token = generateToken(userForToken);
+
     return NextResponse.json(
-      { user: userWithoutPassword },
+      { 
+        user: userWithoutPassword,
+        token: token
+      },
       { status: 201 }
     );
   } catch (error: any) {
