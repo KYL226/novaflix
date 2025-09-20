@@ -10,7 +10,7 @@ import { scheduleIdleCallback, optimizedStateUpdate, optimizedLocalStorage } fro
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => void;
   register: (name: string, email: string, password: string) => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
@@ -39,13 +39,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedToken = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
 
+      console.log('🔍 AuthContext - performAuthCheck:', { 
+        token: storedToken ? 'présent' : 'absent', 
+        user: storedUser ? 'présent' : 'absent' 
+      });
+
       if (storedToken && storedUser) {
         const decoded = verifyToken(storedToken);
         if (decoded) {
+          const user = JSON.parse(storedUser);
+          console.log('🔍 AuthContext - Utilisateur chargé:', user);
           setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          setUser(user);
           return;
+        } else {
+          console.log('❌ AuthContext - Token invalide');
         }
+      } else {
+        console.log('🔍 AuthContext - Aucun token ou utilisateur trouvé');
       }
       
       // Si on arrive ici, c'est qu'il n'y a pas de token valide
@@ -115,6 +126,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       optimizedStateUpdate(setToken, data.token);
       optimizedLocalStorage.setItem('user', JSON.stringify(data.user));
       optimizedLocalStorage.setItem('token', data.token);
+
+      // Retourner les données utilisateur pour permettre la redirection
+      return data.user;
     } catch (error) {
       console.error('Erreur de connexion:', error);
       throw error;

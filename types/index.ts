@@ -13,6 +13,14 @@ export type User = {
   updatedAt?: Date;
 };
 
+export type UserForToken = {
+  _id: string;
+  email: string;
+  name: string;
+  role: 'user' | 'admin';
+  subscription?: 'basic' | 'premium' | 'free';
+};
+
 export type DecodedToken = {
   id: string;
   email: string;

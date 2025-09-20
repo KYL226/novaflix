@@ -206,7 +206,7 @@ export default function SubscriptionPage() {
             Découvrez tous nos contenus avec un abonnement NovaFlix. Annulez à tout moment.
           </p>
         </div>
-
+        
         {/* Configuration Mode Test/Production */}
         <div className="max-w-2xl mx-auto mb-8">
           <Card className="bg-gray-800 border-gray-700">

@@ -1,7 +1,7 @@
 // lib/auth.ts
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User, DecodedToken } from '@/types';
+import { User, DecodedToken, UserForToken } from '@/types';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -14,7 +14,7 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 };
 
-export const generateToken = (user: User): string => {
+export const generateToken = (user: UserForToken): string => {
   return jwt.sign(
     { 
       id: user._id, 

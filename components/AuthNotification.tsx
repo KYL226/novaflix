@@ -21,7 +21,7 @@ export default function AuthNotification() {
     if (isLoading) return;
 
     // Notification de connexion réussie (seulement la première fois)
-    if (user && token && !hasShownWelcome && user._id !== lastUser) {
+    if (user && token && !hasShownWelcome && user._id && user._id !== lastUser) {
       addNotification('success', `Bienvenue, ${user.name} ! Vous êtes maintenant connecté.`);
       setHasShownWelcome(true);
       setLastUser(user._id);

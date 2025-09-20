@@ -4,14 +4,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProtectedRoute } from '@/hooks/useProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Home, Plus } from 'lucide-react';
 import Image from 'next/image';
 
 export default function ManageMoviesPage() {
-  const { user } = useAuth();
+  const { user, isLoading } = useProtectedRoute(true); // true = requireAdmin
   const router = useRouter();
   const [movies, setMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,10 +22,7 @@ export default function ManageMoviesPage() {
   const [typeFilter, setTypeFilter] = useState('');
 
   useEffect(() => {
-    if (!user || user.role !== 'admin') {
-      router.push('/');
-      return;
-    }
+    if (isLoading) return; // Attendre que l'authentification soit vérifiée
 
     const fetchMovies = async () => {
       try {
@@ -44,7 +43,19 @@ export default function ManageMoviesPage() {
     };
 
     fetchMovies();
-  }, [user, router]);
+  }, [isLoading, router]);
+
+  // Afficher un loader pendant la vérification d'authentification
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Vérification des droits d'accès...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Voulez-vous vraiment supprimer "${title}" ?`)) return;
@@ -74,7 +85,27 @@ export default function ManageMoviesPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Gérer les Films</h1>
+        {/* Header avec bouton retour */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Gérer les Films</h1>
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/admin/dashboard')}
+              className="flex items-center space-x-2"
+            >
+              <Home className="w-4 h-4" />
+              <span>Dashboard</span>
+            </Button>
+            <Button
+              onClick={() => router.push('/admin/movies/add')}
+              className="bg-green-600 hover:bg-green-700 flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Ajouter un Film</span>
+            </Button>
+          </div>
+        </div>
 
         {error && (
           <Alert variant="destructive" className="mb-6">
@@ -103,12 +134,6 @@ export default function ManageMoviesPage() {
               <option value="documentaire">Documentaires</option>
             </select>
           </div>
-          <Button
-            onClick={() => router.push('/admin/movies/add')}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            + Ajouter
-          </Button>
         </div>
 
         {/* Liste des films */}

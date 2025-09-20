@@ -8,9 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Home, Download, Crown, Star } from 'lucide-react';
 
+type SubscriptionType = 'basic' | 'premium' | 'free';
+
 interface PaymentSuccessData {
   transaction_id: string;
-  plan: string;
+  plan: SubscriptionType;
   amount?: number;
   currency?: string;
   payment_method?: string;
@@ -43,6 +45,16 @@ export default function PaymentSuccessPage() {
     try {
       console.log('🔍 Vérification du statut du paiement:', txn_id);
 
+      // Valider que le plan est un type d'abonnement valide
+      const validPlans: SubscriptionType[] = ['basic', 'premium', 'free'];
+      if (!validPlans.includes(plan as SubscriptionType)) {
+        setError('Type d\'abonnement invalide');
+        setIsLoading(false);
+        return;
+      }
+
+      const subscriptionType = plan as SubscriptionType;
+
       const response = await fetch(`/api/payments/verify?txn_id=${txn_id}&plan=${plan}`);
       const data = await response.json();
 
@@ -51,8 +63,8 @@ export default function PaymentSuccessPage() {
         
         // Mettre à jour l'utilisateur dans le contexte d'authentification
         if (user && updateUser) {
-          updateUser({ subscription: plan });
-          console.log('✅ Utilisateur mis à jour dans le contexte:', { subscription: plan });
+          updateUser({ subscription: subscriptionType });
+          console.log('✅ Utilisateur mis à jour dans le contexte:', { subscription: subscriptionType });
         }
         
         // Mettre à jour le localStorage
@@ -60,7 +72,7 @@ export default function PaymentSuccessPage() {
         
         setPaymentData({
           transaction_id: txn_id,
-          plan: plan,
+          plan: subscriptionType,
           amount: data.amount,
           currency: data.currency,
           payment_method: data.payment_method,
@@ -78,29 +90,33 @@ export default function PaymentSuccessPage() {
     }
   };
 
-  const getPlanIcon = (plan: string) => {
+  const getPlanIcon = (plan: SubscriptionType) => {
     switch (plan) {
       case 'premium':
         return <Crown className="w-8 h-8 text-yellow-500" />;
       case 'basic':
         return <Star className="w-8 h-8 text-blue-500" />;
+      case 'free':
+        return <CheckCircle className="w-8 h-8 text-green-500" />;
       default:
         return <CheckCircle className="w-8 h-8 text-green-500" />;
     }
   };
 
-  const getPlanName = (plan: string) => {
+  const getPlanName = (plan: SubscriptionType) => {
     switch (plan) {
       case 'premium':
         return 'Premium';
       case 'basic':
         return 'Basic';
+      case 'free':
+        return 'Gratuit';
       default:
         return 'Inconnu';
     }
   };
 
-  const getPlanFeatures = (plan: string) => {
+  const getPlanFeatures = (plan: SubscriptionType) => {
     switch (plan) {
       case 'premium':
         return [
@@ -117,6 +133,12 @@ export default function PaymentSuccessPage() {
           'Qualité HD',
           'Sans publicité',
           'Support standard'
+        ];
+      case 'free':
+        return [
+          'Contenu limité',
+          'Qualité standard',
+          'Avec publicité'
         ];
       default:
         return [];

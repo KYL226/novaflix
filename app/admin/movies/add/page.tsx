@@ -1,4 +1,3 @@
-// app/admin/movies/add/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -9,8 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select } from '@/components/ui/select';
-import { useProtectedRoute } from '@/hooks/useProtectedRoute';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useProtectedRoute } from '@/hooks/useProtectedRoute';
+import FileUpload from '@/components/FileUpload';
+import { ArrowLeft } from 'lucide-react';
 
 export default function AddMoviePage() {
   const { user, isLoading } = useProtectedRoute(true); // true = requireAdmin
@@ -28,9 +30,24 @@ export default function AddMoviePage() {
     videoUrl: '',
     posterUrl: ''
   });
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleVideoUpload = (fileUrl: string, fileName: string) => {
+    setFormData(prev => ({ ...prev, videoUrl: fileUrl }));
+    setUploadError(null);
+  };
+
+  const handleImageUpload = (fileUrl: string, fileName: string) => {
+    setFormData(prev => ({ ...prev, posterUrl: fileUrl }));
+    setUploadError(null);
+  };
+
+  const handleUploadError = (error: string) => {
+    setUploadError(error);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -39,8 +56,20 @@ export default function AddMoviePage() {
     setError(null);
 
     // Validation des données
-    if (!formData.title.trim() || !formData.description.trim() || !formData.duration || !formData.releaseYear || !formData.type || !formData.videoUrl.trim() || !formData.posterUrl.trim()) {
-      setError('Tous les champs sont obligatoires');
+    if (!formData.title.trim() || !formData.description.trim() || !formData.duration || !formData.releaseYear || !formData.type) {
+      setError('Tous les champs obligatoires doivent être remplis');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.videoUrl.trim()) {
+      setError('Veuillez uploader un fichier vidéo');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.posterUrl.trim()) {
+      setError('Veuillez uploader une image poster');
       setLoading(false);
       return;
     }
@@ -64,8 +93,6 @@ export default function AddMoviePage() {
       published: published,
     };
 
-    console.log('Données à envoyer:', movieData); // Debug
-
     try {
       const res = await fetch('/api/admin/movies', {
         method: 'POST',
@@ -77,7 +104,6 @@ export default function AddMoviePage() {
       });
 
       const data = await res.json();
-      console.log('Réponse API:', { status: res.status, data }); // Debug
 
       if (res.ok) {
         router.push('/admin/movies/manage');
@@ -85,7 +111,7 @@ export default function AddMoviePage() {
         setError(data.error || 'Erreur lors de l\'ajout du film');
       }
     } catch (err: any) {
-      console.error('Erreur réseau:', err); // Debug
+      console.error('Erreur réseau:', err);
       setError('Erreur réseau lors de l\'ajout du film');
     } finally {
       setLoading(false);
@@ -104,7 +130,6 @@ export default function AddMoviePage() {
     }
   };
 
-  // Afficher un loader pendant la vérification d'authentification
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -118,38 +143,58 @@ export default function AddMoviePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Ajouter un Nouveau Film</h1>
+      <div className="max-w-4xl mx-auto">
+        {/* Header avec bouton retour */}
+        <div className="flex items-center mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/admin/movies/manage')}
+            className="mr-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Retour
+          </Button>
+          <h1 className="text-2xl font-bold text-gray-800">Ajouter un Nouveau Film</h1>
+        </div>
 
-          {error && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-6">
+        {uploadError && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{uploadError}</AlertDescription>
+          </Alert>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Informations de base</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="title">Titre</Label>
-                <Input 
-                  id="title" 
+                <Label htmlFor="title">Titre *</Label>
+                <Input
+                  id="title"
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   placeholder="Ex: Inception"
-                  required 
+                  required
                 />
               </div>
 
               <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea 
-                  id="description" 
+                <Label htmlFor="description">Description *</Label>
+                <Textarea
+                  id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Description détaillée du film..."
                   rows={4}
-                  required 
+                  required
                 />
               </div>
 
@@ -174,11 +219,11 @@ export default function AddMoviePage() {
                     </Button>
                   </div>
                 ))}
-                <Button 
-                  type="button" 
-                  variant="secondary" 
-                  size="sm" 
-                  onClick={addGenre} 
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={addGenre}
                   className="mt-2"
                 >
                   + Ajouter un genre
@@ -188,33 +233,33 @@ export default function AddMoviePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="duration">Durée (minutes)</Label>
-                  <Input 
-                    id="duration" 
-                    type="number" 
+                  <Input
+                    id="duration"
+                    type="number"
                     min="1"
                     placeholder="120"
                     value={formData.duration}
                     onChange={(e) => handleInputChange('duration', e.target.value)}
-                    required 
+                    required
                   />
                 </div>
                 <div>
                   <Label htmlFor="releaseYear">Année de sortie</Label>
-                  <Input 
-                    id="releaseYear" 
-                    type="number" 
+                  <Input
+                    id="releaseYear"
+                    type="number"
                     min="1900"
                     max={new Date().getFullYear() + 1}
                     placeholder="2024"
                     value={formData.releaseYear}
                     onChange={(e) => handleInputChange('releaseYear', e.target.value)}
-                    required 
+                    required
                   />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="type">Type</Label>
+                <Label htmlFor="type">Type *</Label>
                 <Select
                   id="type"
                   value={formData.type}
@@ -229,62 +274,62 @@ export default function AddMoviePage() {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="videoUrl">Chemin du fichier vidéo</Label>
-                <Input 
-                  id="videoUrl" 
-                  placeholder="ex: films/inception.mp4" 
-                  value={formData.videoUrl}
-                  onChange={(e) => handleInputChange('videoUrl', e.target.value)}
-                  required 
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Chemin relatif dans le dossier secure-media/videos/
-                </p>
-              </div>
-
-              <div>
-                <Label htmlFor="posterUrl">Chemin de l'image poster</Label>
-                <Input 
-                  id="posterUrl" 
-                  placeholder="ex: posters/inception.jpg" 
-                  value={formData.posterUrl}
-                  onChange={(e) => handleInputChange('posterUrl', e.target.value)}
-                  required 
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Chemin relatif dans le dossier secure-media/images/
-                </p>
-              </div>
-
               <div className="flex items-center space-x-2">
-                <Switch 
+                <Switch
                   checked={published}
                   onCheckedChange={setPublished}
                 />
                 <Label>Publier immédiatement</Label>
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="flex gap-4 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.push('/admin/movies/manage')}
-                  className="flex-1"
-                >
-                  Annuler
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-green-600 hover:bg-green-700 flex-1"
-                  disabled={loading}
-                >
-                  {loading ? 'Enregistrement...' : 'Enregistrer le Film'}
-                </Button>
+          {/* Upload des fichiers */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Fichiers média</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <Label>Fichier vidéo *</Label>
+                <FileUpload
+                  type="video"
+                  onUploadSuccess={handleVideoUpload}
+                  onUploadError={handleUploadError}
+                  currentFile={formData.videoUrl}
+                />
               </div>
-            </div>
-          </form>
-        </div>
+
+              <div>
+                <Label>Image poster *</Label>
+                <FileUpload
+                  type="image"
+                  onUploadSuccess={handleImageUpload}
+                  onUploadError={handleUploadError}
+                  currentFile={formData.posterUrl}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Boutons d'action */}
+          <div className="flex justify-end space-x-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/admin/movies/manage')}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="submit"
+              className="bg-green-600 hover:bg-green-700"
+              disabled={loading}
+            >
+              {loading ? 'Enregistrement...' : 'Enregistrer le Film'}
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

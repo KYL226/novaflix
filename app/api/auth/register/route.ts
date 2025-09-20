@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/models';
 import { hashPassword, generateToken } from '@/lib/auth';
-import { User } from '@/types';
+import { User, UserForToken } from '@/types';
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     (userWithoutPassword as any)._id = result.insertedId;
 
     // Créer l'objet utilisateur complet pour le token
-    const userForToken = {
+    const userForToken: UserForToken = {
       _id: result.insertedId.toString(),
       name: userWithoutPassword.name,
       email: userWithoutPassword.email,

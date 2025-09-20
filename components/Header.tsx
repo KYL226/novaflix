@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, LogOut, Home, Film, Tv, BookOpen, Menu, Crown } from 'lucide-react';
+import { Search, User, LogOut, Home, Film, Tv, BookOpen, Menu, Crown, Settings } from 'lucide-react';
 import SearchResults from './SearchResults';
 import ThemeToggle from './ThemeToggle';
 import SimpleSubscriptionStatus from './SimpleSubscriptionStatus';
@@ -97,12 +97,20 @@ export default function Header() {
               {/* Statut d'abonnement simplifié */}
               <SimpleSubscriptionStatus />
               
-              {/* Indicateur de rôle */}
+              {/* Indicateur de rôle et lien admin */}
               {user.role === 'admin' && (
-                <Badge variant="secondary" className="bg-purple-600 hover:bg-purple-700">
-                  <Crown className="h-3 w-3 mr-1" />
-                  Admin
-                </Badge>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="secondary" className="bg-purple-600 hover:bg-purple-700">
+                    <Crown className="h-3 w-3 mr-1" />
+                    Admin
+                  </Badge>
+                  <Link href="/admin/dashboard">
+                    <Button variant="ghost" size="sm" className="text-purple-400 hover:text-purple-300 hover:bg-purple-900/20">
+                      <Settings className="h-4 w-4 mr-1" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                </div>
               )}
               
               <Link href="/profile" className="hover:text-red-500 transition">

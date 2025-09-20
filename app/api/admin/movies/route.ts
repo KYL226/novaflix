@@ -27,13 +27,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    console.log('Données reçues:', body); // Debug
+    console.log('🔍 Données reçues:', body); // Debug
 
     // Validation des champs requis
     const requiredFields = ['title', 'description', 'genre', 'duration', 'releaseYear', 'type', 'videoUrl', 'posterUrl'];
     const missingFields = requiredFields.filter(field => !body[field]);
     
     if (missingFields.length > 0) {
+      console.log('❌ Champs manquants:', missingFields);
+      console.log('🔍 Données reçues:', body);
       return NextResponse.json({ 
         error: `Champs manquants: ${missingFields.join(', ')}` 
       }, { status: 400 });

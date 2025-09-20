@@ -29,9 +29,8 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        await login(email, password);
+        const user = await login(email, password);
         // Redirection basée sur le rôle de l'utilisateur
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
         if (user.role === 'admin') {
           router.push('/admin/dashboard');
         } else {

@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Users, Video, CreditCard, AlertTriangle } from "lucide-react";
+import { Users, Video, CreditCard, AlertTriangle, Globe, Home, Settings, Film } from "lucide-react";
+import Link from "next/link";
 
 export default function AdminDashboard() {
   const { user, isLoading } = useProtectedRoute(true); // true = requireAdmin
@@ -68,9 +69,29 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">
-        Tableau de Bord Admin
-      </h1>
+      {/* Barre de navigation admin */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">
+          Tableau de Bord Admin
+        </h1>
+        <div className="flex items-center space-x-4">
+          <Link href="/admin/movies/manage">
+            <Button variant="outline" className="flex items-center space-x-2">
+              <Settings className="w-4 h-4" />
+              <span>Gérer les Films</span>
+            </Button>
+          </Link>
+          <Link href="/">
+            <Button variant="outline" className="flex items-center space-x-2">
+              <Globe className="w-4 h-4" />
+              <span>Visiter le Site</span>
+            </Button>
+          </Link>
+          <div className="text-sm text-gray-600">
+            Connecté en tant que <span className="font-semibold text-blue-600">{user?.name}</span>
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
@@ -132,16 +153,30 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Button
-          onClick={() => router.push("/admin/movies/add")}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          Ajouter un Film
-        </Button>
-        <Button onClick={() => router.push("/admin/users")} variant="outline">
-          Gérer les Utilisateurs
-        </Button>
+      {/* Actions rapides */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Actions Rapides</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Button
+            onClick={() => router.push("/admin/movies/add")}
+            className="bg-blue-600 hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <Video className="w-4 h-4" />
+            <span>Ajouter un Film</span>
+          </Button>
+          <Button 
+            onClick={() => router.push("/admin/movies/manage")} 
+            variant="outline"
+            className="flex items-center space-x-2"
+          >
+            <Settings className="w-4 h-4" />
+            <span>Gérer les Films</span>
+          </Button>
+          <Button onClick={() => router.push("/admin/users")} variant="outline">
+            <Users className="w-4 h-4 mr-2" />
+            Gérer les Utilisateurs
+          </Button>
+        </div>
       </div>
     </div>
   );
