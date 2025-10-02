@@ -1,4 +1,3 @@
-// app/page.tsx
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,19 +8,18 @@ import FeaturesSection from '@/components/FeaturesSection';
 import PricingSection from '@/components/PricingSection';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
+import FaqSection from '@/components/FaqSection';
 
 export default function HomePage() {
   const { user, isLoading } = useAuth();
 
-  // Si l'utilisateur est connecté, afficher seulement le contenu des films/séries
+  // ✅ Utilisateur connecté — contenu complet
   if (user && !isLoading) {
     return (
       <div className="min-h-screen bg-black text-white">
-        {/* Bannière principale pour utilisateurs connectés */}
         <AuthenticatedHeroSection />
 
-        {/* Rangées de films - vue complète pour utilisateurs connectés */}
-        <main className="mt-2 px-4 pb-8">
+        <main className="mt-4 px-4 pb-12 space-y-10">
           <MovieRow title="Films à la Une" type="film" limit={10} />
           <MovieRow title="Séries Populaires" type="serie" limit={8} />
           <MovieRow title="Documentaires" type="documentaire" limit={6} />
@@ -35,23 +33,32 @@ export default function HomePage() {
     );
   }
 
-  // Si l'utilisateur n'est pas connecté, afficher la landing page complète
+  // 🚫 Utilisateur non connecté — landing page façon Netflix
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Bannière principale */}
+      {/* Hero avec grand visuel, texte et CTA */}
       <HeroSection />
 
-      {/* Rangées de films - aperçu pour non-connectés */}
-      <main className="mt-2 px-4">
-        <MovieRow title="Films à la Une" type="film" limit={6} />
-        <MovieRow title="Séries Populaires" type="serie" limit={6} />
-        <MovieRow title="Documentaires" type="documentaire" limit={4} />
+      {/* Aperçu de films */}
+      <main className="bg-black mt-4 px-4 pb-16">
+        <MovieRow
+          title="Tendances actuelles"
+          type="film"
+          limit={10}
+          variant="poster"
+          showRanking
+        />
       </main>
 
-      {/* Sections de la landing page - uniquement pour non-connectés */}
-      <FeaturesSection />
-      <PricingSection />
-      <CTASection />
+      {/* Sections à la Netflix */}
+      <section className="bg-black border-t border-gray-800">
+        <FeaturesSection />
+        <PricingSection />
+        <FaqSection />
+        <CTASection />
+      </section>
+
+      {/* Footer simple */}
       <Footer />
     </div>
   );

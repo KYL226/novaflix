@@ -30,16 +30,16 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-8">
+    <div className="min-h-screen bg-black text-white py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Mon Profil</h1>
-          <p className="text-gray-400">Gérez vos informations personnelles et votre abonnement</p>
+          <h1 className="text-4xl font-extrabold mb-2">Compte</h1>
+          <p className="text-gray-400">Gérez vos informations et votre abonnement</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Informations du profil */}
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-[#111] border-gray-800">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4">
                 <Avatar className="h-24 w-24">
@@ -66,7 +66,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Actions rapides */}
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-[#111] border-gray-800">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <User className="h-5 w-5" />
@@ -95,7 +95,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Statistiques */}
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-[#111] border-gray-800">
             <CardHeader>
               <CardTitle>Statistiques</CardTitle>
             </CardHeader>
@@ -117,7 +117,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Section Abonnement Compacte */}
-        <Card className="mt-8 bg-gray-800 border-gray-700">
+        <Card className="mt-8 bg-[#111] border-gray-800">
           <CardHeader 
             className="cursor-pointer hover:bg-gray-700/50 transition-colors"
             onClick={toggleSubscriptionDetails}

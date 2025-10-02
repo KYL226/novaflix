@@ -11,9 +11,11 @@ interface MovieRowProps {
   genre?: string;
   type?: 'film' | 'serie' | 'documentaire';
   limit?: number;
+  variant?: 'landscape' | 'poster';
+  showRanking?: boolean;
 }
 
-export default function MovieRow({ title, genre, type, limit = 10 }: MovieRowProps) {
+export default function MovieRow({ title, genre, type, limit = 10, variant = 'landscape', showRanking = false }: MovieRowProps) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -100,12 +102,17 @@ export default function MovieRow({ title, genre, type, limit = 10 }: MovieRowPro
   if (movies.length === 0) return null;
 
   return (
-    <section className="mb-8">
-      <h2 className="text-xl md:text-2xl font-bold mb-4 text-white">{title}</h2>
-      <div className="flex space-x-4 overflow-x-auto pb-2 hide-scrollbar">
+    <section className="mb-10">
+      <h2 className="text-lg md:text-xl font-semibold mb-3 text-white">{title}</h2>
+      <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x snap-mandatory">
         {movies.map((movie) => (
-          <div key={movie._id} className="flex-shrink-0 w-40">
-            <MovieCard movie={movie} />
+          <div key={movie._id} className={variant === 'poster' ? 'flex-shrink-0 w-40 md:w-44 snap-start relative' : 'flex-shrink-0 w-44 snap-start relative'}>
+            {showRanking && (
+              <div className="absolute -left-2 bottom-6 z-10 text-white/80 font-extrabold text-6xl select-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                {String(movies.indexOf(movie) + 1)}
+              </div>
+            )}
+            <MovieCard movie={movie} variant={variant} />
           </div>
         ))}
       </div>

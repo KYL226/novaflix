@@ -31,7 +31,7 @@ export default function AuthenticatedHeroSection() {
 
   if (isLoading) {
     return (
-      <div className="relative w-full h-[50vh] md:h-[60vh] bg-gradient-to-br from-gray-900 via-black to-gray-800 animate-pulse">
+      <div className="relative w-full h-[45vh] md:h-[55vh] bg-gradient-to-br from-gray-900 via-black to-gray-800 animate-pulse">
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col justify-center pl-6 md:pl-16 text-white">
           <div className="h-12 bg-gray-700 rounded w-80 mb-4 animate-pulse"></div>
@@ -48,7 +48,7 @@ export default function AuthenticatedHeroSection() {
 
   if (!movie) {
     return (
-      <div className="relative w-full h-[50vh] md:h-[60vh] bg-gradient-to-br from-red-900 via-black to-gray-900">
+      <div className="relative w-full h-[45vh] md:h-[55vh] bg-gradient-to-br from-red-900 via-black to-gray-900">
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col justify-center pl-6 md:pl-16 text-white">
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
@@ -72,7 +72,7 @@ export default function AuthenticatedHeroSection() {
   return (
     <SecureBackgroundImage
       src={movie.posterUrl}
-      className="relative w-full h-[50vh] md:h-[60vh]"
+      className="relative w-full h-[45vh] md:h-[55vh]"
     >
       {/* Overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>

@@ -7,63 +7,53 @@ export default function FeaturesSection() {
   const features = [
     {
       icon: <Monitor className="w-12 h-12" />,
-      title: "Streaming HD/4K",
-      description: "Profitez de vos contenus préférés en haute définition sur tous vos appareils"
+      title: "Regardez sur votre TV",
+      description: "Smart TV, Playstation, Xbox, Chromecast, Apple TV, lecteurs Blu‑ray et plus."
     },
     {
       icon: <Smartphone className="w-12 h-12" />,
-      title: "Multi-appareils",
-      description: "Regardez sur votre téléphone, tablette, ordinateur ou TV connectée"
+      title: "Regardez partout",
+      description: "Sur téléphone, tablette, ordinateur et TV. Où que vous soyez."
     },
     {
       icon: <Download className="w-12 h-12" />,
-      title: "Téléchargement",
-      description: "Téléchargez vos films et séries pour les regarder hors ligne"
+      title: "Téléchargez pour regarder hors ligne",
+      description: "Enregistrez vos favoris et regardez-les sans connexion."
     },
     {
       icon: <Wifi className="w-12 h-12" />,
-      title: "Sans publicité",
-      description: "Profitez d'une expérience de visionnage sans interruption publicitaire"
+      title: "Sans engagement",
+      description: "Annulez en ligne en deux clics. Aucun frais d'annulation."
     },
     {
       icon: <Shield className="w-12 h-12" />,
       title: "Sécurisé",
-      description: "Vos données et votre vie privée sont protégées avec nos standards de sécurité"
+      description: "Vos données sont protégées selon des standards élevés."
     },
     {
       icon: <Tv className="w-12 h-12" />,
-      title: "Contenu exclusif",
-      description: "Accédez à des films et séries exclusifs que vous ne trouverez nulle part ailleurs"
+      title: "Profils pour les enfants",
+      description: "Créez des profils dédiés avec contrôle parental. Inclus avec votre abonnement."
     }
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-black to-gray-900">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Pourquoi choisir <span className="text-red-600">Novaflix</span> ?
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Découvrez une expérience de streaming exceptionnelle avec nos fonctionnalités premium
-          </p>
+    <section className="py-16 bg-black border-t border-gray-800">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-3">Plus de raisons de nous rejoindre</h2>
+          <p className="text-lg md:text-xl text-gray-300">Tout ce que vous aimez, au même endroit.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((feature, index) => (
-            <div 
+            <div
               key={index}
-              className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 hover:border-red-500/50 transition-all duration-300 hover:transform hover:scale-105 group"
+              className="bg-[#111] rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors"
             >
-              <div className="text-red-500 mb-6 group-hover:text-red-400 transition-colors">
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-4">
-                {feature.title}
-              </h3>
-              <p className="text-gray-300 leading-relaxed">
-                {feature.description}
-              </p>
+              <div className="text-red-500 mb-4">{feature.icon}</div>
+              <h3 className="text-lg md:text-xl font-semibold text-white mb-2">{feature.title}</h3>
+              <p className="text-gray-300">{feature.description}</p>
             </div>
           ))}
         </div>
